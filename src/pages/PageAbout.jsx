@@ -1,38 +1,40 @@
-const product = {
-  name: "Basic Tee 6-Pack",
-  price: "$192",
-  href: "#",
-  breadcrumbs: [
-    { id: 1, name: "Beranda", href: "#" },
-    { id: 2, name: "Movie", href: "#" },
-  ],
-  images: [
-    {
-      src: "https://tailwindcss.com/plus-assets/img/ecommerce-images/product-page-02-secondary-product-shot.jpg",
-      alt: "Two each of gray, white, and black shirts laying flat.",
-    }
-  ],
-  description:
-    'The Basic Tee 6-Pack allows you to fully express your vibrant personality with three grayscale options. Feeling adventurous? Put on a heather gray tee. Want to be a trendsetter? Try our exclusive colorway: "Black". Need to add an extra pop of color to your outfit? Our white tee has you covered.',
-  highlights: [
-    "Hand cut and sewn locally",
-    "Dyed with our proprietary colors",
-    "Pre-washed & pre-shrunk",
-    "Ultra-soft 100% cotton",
-  ],
-  details:
-    'The 6-Pack includes two black, two white, and two heather gray Basic Tees. Sign up for our subscription service and be the first to get new, exciting colors, like our upcoming "Charcoal Gray" limited release.',
-};
+import React from "react";
+import { useParams, useLocation } from "react-router-dom";
+import MediaFilm from "../components/ComponentMediaFilm";
+import CardCast from "../components/ComponentCardCast";
 
 const PageAbout = () => {
+  const { id } = useParams(); // Ambil ID dari URL
+  const location = useLocation();
+  const movie = location.state.movie; // Ambil data movie dari state
+  const product = {
+    id: id,
+    name: movie.title,
+    genres: movie.genres,
+    overview: movie.overview,
+    href: `#/about/${id}`,
+    breadcrumbs: [
+      { id: 1, name: "Beranda", href: "/" },
+      { id: 2, name: "Movie", href: "#/movie" },
+    ],
+    images: [
+      {
+        src: movie.poster_path,
+        alt: movie.title,
+      },
+    ],
+    backdrop_path: movie.backdrop_path,
+    release_date: movie.release_date,
+    vote_average: movie.vote_average,
+  };
 
   return (
     <div className="bg-white">
-      <div className="pt-6">
+      <div>
         <nav aria-label="Breadcrumb">
           <ol
             role="list"
-            className="mx-auto flex max-w-2xl items-center space-x-2 px-4 sm:px-6 lg:max-w-7xl lg:px-8"
+            className="mx-auto flex max-w-2xl items-center space-x-2 px-4 py-3 sm:px-6 lg:max-w-7xl lg:px-8"
           >
             {product.breadcrumbs.map((breadcrumb) => (
               <li key={breadcrumb.id}>
@@ -68,23 +70,42 @@ const PageAbout = () => {
           </ol>
         </nav>
 
-        {/* Image gallery */}
-        <div className="mx-auto mt-6 max-w-2xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:gap-x-8 lg:px-8">
+        {/* Backdrop Image dengan Overlay */}
+        <div
+          className="relative w-full h-[450px] bg-gray-900 bg-cover bg-center"
+          style={{
+            backgroundImage: product.backdrop_path
+              ? `url(https://image.tmdb.org/t/p/original${product.backdrop_path})`
+              : "url(/images/unknown-backdrop.webp)",
+          }}
+        >
+          {/* Overlay Hitam untuk Kontras */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+        </div>
+
+        {/* Informasi Movie */}
+        <div className="mx-auto max-w-7xl px-8 md:grid md:grid-cols-3 md:gap-x-8 mt-[-150px] relative z-10">
+          {/* Poster Film */}
           <img
             alt={product.images[0].alt}
-            src={product.images[0].src}
-            className="hidden size-full rounded-lg object-cover lg:block"
+            src={
+              product.images[0].src
+                ? `https://image.tmdb.org/t/p/w500${product.images[0].src}`
+                : "/images/unknown-image-default.webp"
+            }
+            className="hidden size-full rounded-lg object-cover md:block"
           />
           {/* Deskripsi Movie */}
-          <div className="lg:col-span-2 flex flex-col justify-center">
-            <h1 className="text-2xl font-bold text-gray-900">
-              {product?.title || "Unknown Title"}
+          <div className="md:col-span-2 flex flex-col justify-center bg-white lg:bg-transparent p-6 rounded-lg shadow-lg lg:shadow-none">
+            <h1 className="text-3xl font-bold text-gray-900">
+              {product?.name || "Unknown Title"}
             </h1>
 
             {/* Rating & Tanggal Rilis */}
             <p className="mt-2 text-gray-500">
-              ⭐ {product?.vote_average?.toFixed(1)} | 📅{" "}
-              {product?.release_date || "TBA"}
+              ⭐{" "}
+              {product.vote_average ? product.vote_average.toFixed(1) : "N/A"} |
+              📅 {product?.release_date || "TBA"}
             </p>
 
             {/* Genre */}
@@ -112,46 +133,15 @@ const PageAbout = () => {
           </div>
         </div>
 
-        {/* Product info */}
-        <div className="mx-auto  px-4 pt-10 pb-16 sm:px-6 lg:grid lg:max-w-7xl ">
-          <div className="lg:col-span-2 lg:border-r lg:border-gray-200 lg:pr-8">
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-              {product.name}
-            </h1>
-          </div>
-          <div className="">
-            {/* Description and details */}
-            <div>
-              <h3 className="sr-only">Description</h3>
+        {/* Container Utama */}
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          {/* Top Billed Cast Section */}
+          <h2 className="text-xl font-bold mt-6">Top Billed Cast</h2>
+          <CardCast id={id} />
 
-              <div className="space-y-6">
-                <p className="text-base text-gray-900">{product.description}</p>
-              </div>
-            </div>
-
-            <div className="mt-10">
-              <h3 className="text-sm font-medium text-gray-900">Highlights</h3>
-
-              <div className="mt-4">
-                <ul role="list" className="list-disc space-y-2 pl-4 text-sm">
-                  {product.highlights.map((highlight) => (
-                    <li key={highlight} className="text-gray-400">
-                      <span className="text-gray-600">{highlight}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            <div className="mt-10">
-              <h2 className="text-sm font-medium text-gray-900">Details</h2>
-
-              <div className="mt-4 space-y-6">
-                <p className="text-sm text-gray-600">{product.details}</p>
-              </div>
-            </div>
-          </div>
-
+          {/* Media Section */}
+          <h2 className="text-xl font-bold mt-6">Media</h2>
+          <MediaFilm id={id} />
         </div>
       </div>
     </div>

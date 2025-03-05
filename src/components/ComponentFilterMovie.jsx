@@ -1,7 +1,7 @@
 import React from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { useQuery } from "@tanstack/react-query";
 import { fetchFilteredMovies, fetchFilteredTVSeries } from "../services/movieApi";
+import useSearchQuery from "../services/useSearchQuery";
 import CardMovie2 from "./ComponentCardMovie2";
 import {
   Dialog,
@@ -108,11 +108,14 @@ export default function FilterMovie({ Type }) {
     },
   ];
 
-  const { data: filteredMovies, isLoading: filteredLoading, isError: filteredError } = useQuery({
-    queryKey: ["filteredData", Type, selectedFilters], 
-    queryFn: () => (Type === "Movie" ? fetchFilteredMovies(selectedFilters) : fetchFilteredTVSeries(selectedFilters)),
-    enabled: !!Type, // Mencegah query berjalan jika Type belum ada
-  });
+
+  // Urutan Fungsi = queryKey, query, fetchFunction, bolean = true
+  const { data: filteredMovies, isLoading: filteredLoading, isError: filteredError } = useSearchQuery(
+    "filteredData", 
+    selectedFilters, 
+    Type === "Movie" ? fetchFilteredMovies : fetchFilteredTVSeries,
+    !!Type
+  );
 
   const handleFilterChange = (category, value) => {
     setSelectedFilters((prev) => {

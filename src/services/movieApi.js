@@ -1,70 +1,104 @@
-import axios from "axios";
+import { apiClient } from "../api/filmApi";
 
-const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
-const BASE_URL = import.meta.env.VITE_TMDB_BASE_URL;
+// fungsi khusus untuk movie & TV series
+const fetchFilteredData = async (type, filters) => {
+  try {
+    const { sortBy = "popularity.desc", genres, years, languages } = filters;
+    const today = new Date().toISOString().split("T")[0];
 
-const apiClient = axios.create({
-  baseURL: BASE_URL,
-  params: {
-    api_key: API_KEY,
-    language: "en-US",
-  },
-});
+    const params = {
+      sort_by: sortBy,
+      with_genres: genres?.length ? genres.join(",") : undefined,
+      with_original_language: languages || undefined,
+      "release_date.lte": type === "movie" ? today : undefined,
+      "first_air_date.lte": type === "tv" ? today : undefined,
+      primary_release_year: type === "movie" ? years || undefined : undefined,
+      first_air_date_year: type === "tv" ? years || undefined : undefined,
+    };
+
+    const response = await apiClient.get(`/discover/${type}`, { params });
+    return response.data.results;
+  } catch (error) {
+    console.error(`Error fetching ${type} data:`, error.response?.status, error.message);
+    return [];
+  }
+};
 
 // Fetch movies using React Query
 export const fetchSearchMovies = async (query) => {
-  const response = await apiClient.get("/search/movie", {
-    params: { query },
-  });
-  return response.data.results;
+  try {
+    const response = await apiClient.get("/search/movie", {
+      params: { query },
+    });
+    return response.data.results;
+  } catch(e) {
+    console.error("Error fetching data:", e.response?.status, e.message);
+    return [];
+  }
 };
 
 export const fetchTrendingMovies = async (timeWindow) => {
-  const response = await apiClient.get(`/trending/movie/${timeWindow}`);
-  return response.data.results;
+  try {
+    const response = await apiClient.get(`/trending/movie/${timeWindow}`);
+    return response.data.results;
+  } catch(e) {
+    console.error("Error fetching data:", e.response?.status, e.message);
+    return [];
+  }
 };
 
 export const fetchPopularMovies = async () => {
-  const response = await apiClient.get("/movie/popular");
-  return response.data.results;
+  try {
+    const response = await apiClient.get("/movie/popular");
+    return response.data.results;
+  } catch(e) {
+    console.error("Error fetching data:", e.response?.status, e.message);
+    return [];
+  }
 };
 
 export const fetchTopRatedMovies = async () => {
-  const response = await apiClient.get("/movie/top_rated");
-  return response.data.results;
+  try {
+    const response = await apiClient.get("/movie/top_rated");
+    return response.data.results;
+  } catch(e) {
+    console.error("Error fetching data:", e.response?.status, e.message);
+    return [];
+  }
 };
 
-export const fetchFilteredMovies = async (filters) => {
-  const { sortBy, genres, years, languages } = filters;
-  const today = new Date().toISOString().split("T")[0]; // Format: "YYYY-MM-DD"
-  const params = {
-    api_key: API_KEY,
-    language: "en-US",
-    sort_by: sortBy || "popularity.desc",
-    with_genres: genres?.length ? genres.join(",") : undefined,
-    primary_release_year: years ? years : undefined,
-    with_original_language: languages ? languages : undefined,
-    "release_date.lte": today,
-  };
-  const response = await apiClient.get("/discover/movie", { params });
+// Export fungsi khusus untuk movie & TV series
+export const fetchFilteredMovies = (filters) => fetchFilteredData("movie", filters);
+export const fetchFilteredTVSeries = (filters) => fetchFilteredData("tv", filters);
 
-  return response.data.results;
+export const fetchMovieCredits = async (movieId) => {
+  try {
+    const response = await apiClient.get(`/movie/${movieId}/credits`);
+    return response.data.cast; // Hanya mengembalikan daftar cast
+  } catch(e) {
+    console.error("Error fetching data:", e.response?.status, e.message);
+    return [];
+  }
 };
 
+export const fetchMovieMedia = async (movieId) => {
+  try {
+    const [imagesResponse, videosResponse] = await Promise.all([
+      apiClient.get(`/movie/${movieId}/images`),
+      apiClient.get(`/movie/${movieId}/videos`),
+    ]);
 
-export const fetchFilteredTVSeries = async (filters) => {
-  const { sortBy, genres, years, languages } = filters;
-  const today = new Date().toISOString().split("T")[0]; // Format: "YYYY-MM-DD"
-  const params = {
-    api_key: API_KEY,
-    language: "en-US",
-    sort_by: sortBy || "popularity.desc",
-    with_genres: genres?.length ? genres.join(",") : undefined,
-    first_air_date_year: years ? years : undefined,
-    with_original_language: languages ? languages : undefined,
-    "first_air_date.lte": today, // ⬅️ Filter hanya series yang sudah rilis
-  };
-  const response = await apiClient.get("/discover/tv", { params });
+     const trailers = videosResponse.data?.results?.filter(
+      (video) => video.type === "Trailer"
+    ) || [];
 
-  return response.data.results;
+    return {
+      backdrops: imagesResponse.data?.backdrops || [],
+      posters: imagesResponse.data?.posters || [],
+      videos: trailers,
+    };
+  } catch(e) {
+    console.error("Error fetching data:", e.response?.status, e.message);
+    return { backdrops: [], posters: [], videos: [] };
+  }
 };

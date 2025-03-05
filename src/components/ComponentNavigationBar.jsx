@@ -16,8 +16,8 @@ const NavigationBar = ({ query, setQuery }) => {
 
   const navigation = [
     { name: "Beranda", href: "/", current: location.pathname === "/" },
-    { name: "Movie", href: "/#movie", current: location.pathname === "/movie" },
-    { name: "TV Shows", href: "/#tv-shows", current: location.pathname === "/tv-shows" },
+    { name: "Movie", href: "#/movie", current: location.pathname === "/movie" },
+    { name: "TV Shows", href: "#/tv-shows", current: location.pathname === "/tv-shows" },
   ];
 
   return (

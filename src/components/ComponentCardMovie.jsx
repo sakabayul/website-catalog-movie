@@ -1,15 +1,16 @@
-import React, { useRef, useState, useEffect } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 
 const CardMovie = ({ movies, isLoading, isError, query }) => {
-  const scrollRef = useRef(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
+  const scrollRef = React.useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = React.useState(false);
+  const [canScrollRight, setCanScrollRight] = React.useState(false);
+  const navigate = useNavigate();
 
   // Cek posisi scroll saat pertama kali dimuat & saat berubah
-  useEffect(() => {
+  React.useEffect(() => {
     const scrollContainer = scrollRef.current; // Simpan dalam variabel lokal
-  
     const checkScroll = () => {
       if (scrollContainer) {
         setCanScrollLeft(scrollContainer.scrollLeft > 0);
@@ -39,6 +40,10 @@ const CardMovie = ({ movies, isLoading, isError, query }) => {
         behavior: "smooth",
       });
     }
+  };
+
+  const handleCardClick = (movie) => {
+    navigate(`/about/${movie.id}`, { state: { movie } });
   };
 
   if (isLoading) {
@@ -80,7 +85,8 @@ const CardMovie = ({ movies, isLoading, isError, query }) => {
             movies.map((movie) => (
               <div
                 key={movie.id}
-                className="group relative min-w-[160px] sm:min-w-[200px] md:min-w-[240px] lg:min-w-[280px] bg-gray-900 text-white rounded-lg overflow-hidden shadow-lg hover:scale-105 transition-transform duration-300"
+                onClick={() => handleCardClick(movie)}
+                className="cursor-pointer group relative min-w-[160px] sm:min-w-[200px] md:min-w-[240px] lg:min-w-[280px] bg-gray-900 text-white rounded-lg overflow-hidden shadow-lg hover:scale-105 transition-transform duration-300"
               >
                 <img
                   src={

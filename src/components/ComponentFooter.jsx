@@ -32,11 +32,11 @@ import {
                 </li>
                 <li className="flex items-center gap-2">
                   <FilmIcon className="w-5 h-5 text-gray-400" />
-                  <a href="/#movie" className="hover:text-white">Movie</a>
+                  <a href="#/movie" className="hover:text-white">Movie</a>
                 </li>
                 <li className="flex items-center gap-2">
                   <TvIcon className="w-5 h-5 text-gray-400" />
-                  <a href="/#tv-shows" className="hover:text-white">TV Shows</a>
+                  <a href="#/tv-shows" className="hover:text-white">TV Shows</a>
                 </li>
                 <li className="flex items-center gap-2">
                   <InformationCircleIcon className="w-5 h-5 text-gray-400" />

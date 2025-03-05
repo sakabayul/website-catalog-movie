@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import CardMovie from "../components/ComponentCardMovie";
 import CardMovie2 from "../components/ComponentCardMovie2";
 import {
@@ -8,46 +7,35 @@ import {
   fetchPopularMovies,
   fetchTopRatedMovies, // Import fungsi baru
 } from "../services/movieApi";
+import useSearchQuery from "../services/useSearchQuery";
 
 const PageHome = ({ query }) => {
   const [timeWindow, setTimeWindow] = useState("day");
 
+  // Urutan Fungsi = queryKey, query, fetchFunction, bolean = true
   const {
     data: movies,
-    searchLoading,
-    searchError,
-  } = useQuery({
-    queryKey: ["movies", query],
-    queryFn: () => fetchSearchMovies(query),
-    enabled: query.length > 2,
-  });
+    isLoading: searchLoading,
+    isError: searchError,
+  } = useSearchQuery("movies", query, fetchSearchMovies, query.length > 2);
 
   const {
     data: trendingMovies,
     isLoading: trendingLoading,
     isError: trendingError,
-  } = useQuery({
-    queryKey: ["trendingMovies", timeWindow],
-    queryFn: () => fetchTrendingMovies(timeWindow),
-  });
+  } = useSearchQuery("trendingMovies", timeWindow, fetchTrendingMovies);
 
   const {
     data: popularMovies,
     isLoading: popularLoading,
     isError: popularError,
-  } = useQuery({
-    queryKey: ["popularMovies"],
-    queryFn: fetchPopularMovies,
-  });
+  } = useSearchQuery("popularMovies", "", fetchPopularMovies);
 
   const {
     data: topRatedMovies,
     isLoading: topRatedLoading,
     isError: topRatedError,
-  } = useQuery({
-    queryKey: ["topRatedMovies"],
-    queryFn: fetchTopRatedMovies,
-  });
+  } = useSearchQuery("topRatedMovies", "", fetchTopRatedMovies);
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

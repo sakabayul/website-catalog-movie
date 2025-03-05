@@ -17,7 +17,7 @@ const App = () => {
         <Route path="/" element={<PageHome query={query} setQuery={setQuery} />} />
         <Route path="/movie" element={<PageMovie />} />
         <Route path="/tv-shows" element={<PageTVShow />} />
-        <Route path="/about" element={<PageAbout />} />
+        <Route path="/about/:id" element={<PageAbout />} />
       </Routes>
       <Footer />
     </Router>
