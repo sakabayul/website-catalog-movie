@@ -79,7 +79,7 @@ const CardCast = ({ id }) => {
                   key={index}
                   className="w-32 flex-shrink-0 text-center bg-white p-2 rounded-lg shadow-md"
                 >
-                  <div className="animate-pulse bg-gray-300 rounded-lg w-32 h-40"></div>
+                  <div className="animate-pulse bg-gray-500 rounded-lg w-32 h-40"></div>
                   <div className="mt-2 h-4 bg-gray-300 rounded w-3/4 mx-auto"></div>
                 </div>
               ))}

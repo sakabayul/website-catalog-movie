@@ -34,7 +34,7 @@ const MediaFilm = ({ id, movie }) => {
           .map((_, index) => (
             <div
               key={index}
-              className="animate-pulse bg-gray-300 rounded-lg w-full h-40"
+              className="animate-pulse bg-gray-500 rounded-lg w-full h-40"
             ></div>
           ))}
       </div>

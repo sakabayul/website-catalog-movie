@@ -3,7 +3,7 @@ import {
   DisclosureButton,
   DisclosurePanel,
 } from "@headlessui/react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import MovieSearch from "./ComponentMovieSearch";
 
@@ -15,9 +15,8 @@ const NavigationBar = ({ query, setQuery }) => {
   const location = useLocation();
 
   const navigation = [
-    { name: "Beranda", href: "/", current: location.pathname === "/" },
-    { name: "Movie", href: "#/movie", current: location.pathname === "/movie" },
-    { name: "TV Shows", href: "#/tv-shows", current: location.pathname === "/tv-shows" },
+    { name: "Movies", href: "/movie", current: location.pathname === "/movie" },
+    { name: "TV Shows", href: "/tv-shows", current: location.pathname === "/tv-shows" },
   ];
 
   return (
@@ -41,18 +40,20 @@ const NavigationBar = ({ query, setQuery }) => {
           </div>
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
             <div className="flex shrink-0 items-center">
+            <Link to="/">
               <img
                 alt="Your Company"
                 src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg"
-                className="h-4 w-auto"
+                className="h-4 w-auto cursor-pointer"
               />
+            </Link>
             </div>
             <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4">
                 {navigation.map((item) => (
-                  <a
+                  <Link
                     key={item.name}
-                    href={item.href}
+                    to={item.href}
                     aria-current={item.current ? "page" : undefined}
                     className={classNames(
                       item.current
@@ -62,7 +63,7 @@ const NavigationBar = ({ query, setQuery }) => {
                     )}
                   >
                     {item.name}
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -78,8 +79,8 @@ const NavigationBar = ({ query, setQuery }) => {
           {navigation.map((item) => (
             <DisclosureButton
               key={item.name}
-              as="a"
-              href={item.href}
+              as="Link"
+              to={item.href}
               aria-current={item.current ? "page" : undefined}
               className={classNames(
                 item.current

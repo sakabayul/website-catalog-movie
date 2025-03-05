@@ -65,7 +65,7 @@ const PageHome = ({ query }) => {
               }`}
               onClick={() => setTimeWindow("day")}
             >
-              Hari Ini
+              Today
             </button>
             <button
               className={`px-4 py-2 rounded-lg transition-all duration-300 cursor-pointer ${
@@ -75,7 +75,7 @@ const PageHome = ({ query }) => {
               }`}
               onClick={() => setTimeWindow("week")}
             >
-              Minggu Ini
+              This Week
             </button>
           </div>
           <CardMovie

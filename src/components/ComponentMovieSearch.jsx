@@ -37,7 +37,7 @@ const MovieSearch = ({ query, setQuery }) => {
         <input
           type="text"
           className="border p-2 pl-12 w-full rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-100 transition-all duration-200 hover:bg-white"
-          placeholder="Cari film..."
+          placeholder="Search film..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyPress}

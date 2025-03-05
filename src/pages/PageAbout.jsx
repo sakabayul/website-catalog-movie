@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 import MediaFilm from "../components/ComponentMediaFilm";
 import CardCast from "../components/ComponentCardCast";
 import { fetchGenres } from "../services/movieApi";
@@ -16,8 +16,8 @@ const PageAbout = () => {
     overview: movie.overview,
     href: `#/about/${id}`,
     breadcrumbs: [
-      { id: 1, name: "Beranda", href: "/" },
-      { id: 2, name: "Movie", href: "#/movie" },
+      { id: 1, name: "Home Page", href: "/" },
+      { id: 2, name: movie.first_air_date? "TV Series" : "Movies", href: movie.first_air_date? "/tv-shows" : "/movie" },
     ],
     images: [
       {
@@ -57,12 +57,12 @@ const PageAbout = () => {
             {product.breadcrumbs.map((breadcrumb) => (
               <li key={breadcrumb.id}>
                 <div className="flex items-center">
-                  <a
-                    href={breadcrumb.href}
+                  <Link
+                    to={breadcrumb.href}
                     className="mr-2 text-sm font-medium text-gray-900"
                   >
                     {breadcrumb.name}
-                  </a>
+                  </Link>
                   <svg
                     fill="currentColor"
                     width={16}
@@ -138,14 +138,14 @@ const PageAbout = () => {
 
             {/* Tombol Tonton Trailer */}
             {product?.trailer_url && (
-              <a
-                href={product.trailer_url}
+              <Link
+                to={product.trailer_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-4 inline-block bg-indigo-600 px-4 py-2 text-white rounded-lg hover:bg-indigo-700"
               >
                 Watch Trailer 🎬
-              </a>
+              </Link>
             )}
           </div>
         </div>
