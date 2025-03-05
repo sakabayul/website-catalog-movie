@@ -1,12 +1,27 @@
-import MovieSearch from "./components/MovieSearch";
-import './app.css'
+import React from 'react';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import NavigationBar from './components/ComponentNavigationBar';
+import PageHome from './pages/PageHome';
+import PageMovie from './pages/PageMovie';
+import PageTVShow from './pages/PageTVShow';
+import PageAbout from './pages/PageAbout';
+import Footer from './components/ComponentFooter';
 
-function App() {
+const App = () => {
+  const [query, setQuery] = React.useState("");
+
   return (
-    <div className="">
-      <MovieSearch />
-    </div>
+    <Router>
+      <NavigationBar query={query} setQuery={setQuery} />
+      <Routes>
+        <Route path="/" element={<PageHome query={query} setQuery={setQuery} />} />
+        <Route path="/movie" element={<PageMovie />} />
+        <Route path="/tv-shows" element={<PageTVShow />} />
+        <Route path="/about" element={<PageAbout />} />
+      </Routes>
+      <Footer />
+    </Router>
   );
-}
+};
 
 export default App;
