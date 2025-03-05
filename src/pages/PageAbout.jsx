@@ -101,7 +101,7 @@ const PageAbout = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
         </div>
 
-        {/* Informasi Movie */}
+        {/* Informasi Movies */}
         <div className="mx-auto max-w-7xl px-8 md:grid md:grid-cols-3 md:gap-x-8 mt-[-150px] relative z-10">
           {/* Poster Film */}
           <img
@@ -113,7 +113,7 @@ const PageAbout = () => {
             }
             className="hidden size-full rounded-lg object-cover md:block"
           />
-          {/* Deskripsi Movie */}
+          {/* Deskripsi Movies */}
           <div className="md:col-span-2 flex flex-col justify-center bg-white lg:bg-transparent p-6 rounded-lg shadow-lg lg:shadow-none">
             <h1 className="text-3xl font-bold text-gray-900">
               {product?.name || "Unknown Title"}

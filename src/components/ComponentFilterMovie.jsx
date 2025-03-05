@@ -34,7 +34,7 @@ export default function FilterMovie({ Type }) {
   const sortOptions = [
     { name: "Most Popular", value: "popularity.desc" },
     { name: "Best Rating", value: "vote_average.desc" },
-    { name: "Newest", value: Type === "Movie"? "release_date.desc" : "first_air_date.desc" },
+    { name: "Newest", value: Type === "Movies"? "release_date.desc" : "first_air_date.desc" },
   ];
 
   const movieGenres = [
@@ -53,7 +53,7 @@ export default function FilterMovie({ Type }) {
     { value: 9648, label: "Mystery" },
     { value: 10749, label: "Romance" },
     { value: 878, label: "Science Fiction" },
-    { value: 10770, label: "TV Movie" },
+    { value: 10770, label: "TV Movies" },
     { value: 53, label: "Thriller" },
     { value: 10752, label: "War" },
     { value: 37, label: "Western" }
@@ -81,7 +81,7 @@ export default function FilterMovie({ Type }) {
     {
       id: "genres",
       name: "Genre",
-      options: Type === "Movie" ? movieGenres : tvGenres,
+      options: Type === "Movies" ? movieGenres : tvGenres,
     },
     {
       id: "years",
@@ -113,7 +113,7 @@ export default function FilterMovie({ Type }) {
   const { data: filteredMovies, isLoading: filteredLoading, isError: filteredError } = useSearchQuery(
     "filteredData", 
     selectedFilters, 
-    Type === "Movie" ? fetchFilteredMovies : fetchFilteredTVSeries,
+    Type === "Movies" ? fetchFilteredMovies : fetchFilteredTVSeries,
     !!Type
   );
 

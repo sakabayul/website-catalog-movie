@@ -4,7 +4,7 @@ import FilterMovie from "../components/ComponentFilterMovie";
 const PageMovie = () => {
     return (
     <>
-      <FilterMovie Type={"Movie"} />
+      <FilterMovie Type={"Movies"} />
     </>
     )
   };
