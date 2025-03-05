@@ -8,6 +8,6 @@ export const apiClient = axios.create({
   params: {
     api_key: API_KEY,
     language: "en-US",
-    include_image_language: "en,null"
+    include_image_language: "en,null",
   },
 });

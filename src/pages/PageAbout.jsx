@@ -2,15 +2,17 @@ import React from "react";
 import { useParams, useLocation } from "react-router-dom";
 import MediaFilm from "../components/ComponentMediaFilm";
 import CardCast from "../components/ComponentCardCast";
+import { fetchGenres } from "../services/movieApi";
 
 const PageAbout = () => {
   const { id } = useParams(); // Ambil ID dari URL
+  const [genres, setGenres] = React.useState([]);
   const location = useLocation();
   const movie = location.state.movie; // Ambil data movie dari state
   const product = {
     id: id,
-    name: movie.title,
-    genres: movie.genres,
+    name: movie.title || movie.name,
+    genres: movie.genre_ids,
     overview: movie.overview,
     href: `#/about/${id}`,
     breadcrumbs: [
@@ -24,9 +26,25 @@ const PageAbout = () => {
       },
     ],
     backdrop_path: movie.backdrop_path,
-    release_date: movie.release_date,
+    release_date: movie.release_date || movie.first_air_date,
     vote_average: movie.vote_average,
   };
+
+  React.useEffect(() => {
+    const getGenres = async () => {
+      const Type = movie.first_air_date? "tv" : "movie"
+      const allGenres = await fetchGenres(Type); // Ambil daftar genre (movie/tv)
+      const matchedGenres = allGenres
+        .filter((genre) => movie.genre_ids.includes(genre.id)) // Cocokkan ID
+        .map((genre) => genre.name); // Ambil nama genre
+
+      setGenres(matchedGenres);
+    };
+
+    if (movie.genre_ids?.length > 0) {
+      getGenres();
+    }
+  }, [movie]);
 
   return (
     <div className="bg-white">
@@ -110,8 +128,7 @@ const PageAbout = () => {
 
             {/* Genre */}
             <p className="mt-2 text-sm text-gray-700">
-              {product?.genres?.map((genre) => genre.name).join(", ") ||
-                "No genres available"}
+              {genres.length > 0 ? genres.join(", ") : "No genres available"}
             </p>
 
             {/* Sinopsis */}
@@ -141,7 +158,7 @@ const PageAbout = () => {
 
           {/* Media Section */}
           <h2 className="text-xl font-bold mt-6">Media</h2>
-          <MediaFilm id={id} />
+          <MediaFilm id={id} movie={movie} />
         </div>
       </div>
     </div>

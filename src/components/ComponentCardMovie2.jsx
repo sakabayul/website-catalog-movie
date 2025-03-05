@@ -1,6 +1,13 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const CardMovie2 = ({ movies, isLoading, isError, query }) => {
+  const navigate = useNavigate();
+
+  const handleCardClick = (movie) => {
+    navigate(`/about/${movie.id}`, { state: { movie } });
+  };
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6 px-4">
@@ -31,7 +38,8 @@ const CardMovie2 = ({ movies, isLoading, isError, query }) => {
         movies.map((movie) => (
           <div
             key={movie.id}
-            className="relative group bg-gray-900 text-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
+            onClick={() => handleCardClick(movie)}
+            className="cursor-pointer relative group bg-gray-900 text-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
           >
             {/* Image */}
             <div className="relative w-full aspect-[2/3] overflow-hidden">

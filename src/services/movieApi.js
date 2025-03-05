@@ -87,8 +87,8 @@ export const fetchMovieMedia = async (movieId) => {
       apiClient.get(`/movie/${movieId}/images`),
       apiClient.get(`/movie/${movieId}/videos`),
     ]);
-
-     const trailers = videosResponse.data?.results?.filter(
+    console.log("videosResponse:", videosResponse.data?.results);
+    const trailers = videosResponse.data?.results?.filter(
       (video) => video.type === "Trailer"
     ) || [];
 
@@ -97,8 +97,41 @@ export const fetchMovieMedia = async (movieId) => {
       posters: imagesResponse.data?.posters || [],
       videos: trailers,
     };
-  } catch(e) {
-    console.error("Error fetching data:", e.response?.status, e.message);
+  } catch (e) {
+    console.error("Error fetching movie data:", e.response?.status, e.message);
     return { backdrops: [], posters: [], videos: [] };
   }
 };
+
+export const fetchTvMedia = async (tvId) => {
+  try {
+    const [imagesResponse, videosResponse] = await Promise.all([
+      apiClient.get(`/tv/${tvId}/images`),
+      apiClient.get(`/tv/${tvId}/videos`),
+    ]);
+    console.log("videosResponse:", videosResponse.data?.results);
+    const trailers = videosResponse.data?.results?.filter(
+      (video) => video.type === "Trailer"
+    ) || [];
+
+    return {
+      backdrops: imagesResponse.data?.backdrops || [],
+      posters: imagesResponse.data?.posters || [],
+      videos: trailers,
+    };
+  } catch (e) {
+    console.error("Error fetching TV data:", e.response?.status, e.message);
+    return { backdrops: [], posters: [], videos: [] };
+  }
+};
+
+export const fetchGenres = async (type) => {
+  try {
+    const response = await apiClient.get(`/genre/${type}/list`);
+    return response.data.genres; // Mengembalikan daftar genre
+  } catch (error) {
+    console.error(`Error fetching ${type} genres:`, error.response?.status, error.message);
+    return [];
+  }
+};
+
