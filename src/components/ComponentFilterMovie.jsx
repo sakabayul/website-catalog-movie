@@ -1,6 +1,19 @@
+/**
+ * FilterMovie Component
+ *
+ * Komponen ini digunakan untuk menampilkan daftar film atau serial TV berdasarkan filter yang dipilih pengguna.
+ * Filter yang tersedia meliputi: Genre, Tahun Rilis, dan Bahasa.
+ * Komponen juga mendukung sorting berdasarkan popularitas, rating, dan tanggal rilis.
+ *
+ * @param {Object} props
+ * @param {string} props.Type - Jenis media yang akan difilter, bisa "Movies" atau "TV Shows".
+ */
 import React from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { fetchFilteredMovies, fetchFilteredTVSeries } from "../services/movieApi";
+import {
+  fetchFilteredMovies,
+  fetchFilteredTVSeries,
+} from "../services/movieApi";
 import useSearchQuery from "../services/useSearchQuery";
 import CardMovie2 from "./ComponentCardMovie2";
 import {
@@ -23,20 +36,28 @@ import {
 } from "@heroicons/react/20/solid";
 
 export default function FilterMovie({ Type }) {
+  // State untuk mengontrol tampilan filter pada tampilan mobile
   const [mobileFiltersOpen, setMobileFiltersOpen] = React.useState(false);
+
+  // State untuk menyimpan filter yang dipilih pengguna
   const [selectedFilters, setSelectedFilters] = React.useState({
-    sortBy: "popularity.desc",
+    sortBy: "popularity.desc", // Default sorting berdasarkan popularitas
     genres: [],
     years: "",
     languages: "",
   });
 
+  // Opsi sorting yang tersedia
   const sortOptions = [
     { name: "Most Popular", value: "popularity.desc" },
     { name: "Best Rating", value: "vote_average.desc" },
-    { name: "Newest", value: Type === "Movies"? "release_date.desc" : "first_air_date.desc" },
+    {
+      name: "Newest",
+      value: Type === "Movies" ? "release_date.desc" : "first_air_date.desc",
+    },
   ];
 
+  // Data genre berdasarkan tipe media (Movies atau TV Shows)
   const movieGenres = [
     { value: 28, label: "Action" },
     { value: 12, label: "Adventure" },
@@ -56,9 +77,9 @@ export default function FilterMovie({ Type }) {
     { value: 10770, label: "TV Movies" },
     { value: 53, label: "Thriller" },
     { value: 10752, label: "War" },
-    { value: 37, label: "Western" }
+    { value: 37, label: "Western" },
   ];
-
+  // List genre untuk film
   const tvGenres = [
     { value: "10759", label: "Action & Adventure" },
     { value: "35", label: "Comedy" },
@@ -74,9 +95,9 @@ export default function FilterMovie({ Type }) {
     { value: "10764", label: "Reality" },
     { value: "10766", label: "Soap" },
     { value: "10767", label: "Talk" },
-    { value: "10768", label: "War & Politics" }
+    { value: "10768", label: "War & Politics" },
   ];
-
+  // Daftar filter yang digunakan dalam UI
   const filters = [
     {
       id: "genres",
@@ -108,15 +129,26 @@ export default function FilterMovie({ Type }) {
     },
   ];
 
-
-  // Urutan Fungsi = queryKey, query, fetchFunction, bolean = true
-  const { data: filteredMovies, isLoading: filteredLoading, isError: filteredError } = useSearchQuery(
-    "filteredData", 
-    selectedFilters, 
+  /**
+   * Mengambil data film atau TV Shows berdasarkan filter yang dipilih.
+   * Menggunakan custom hook `useSearchQuery` untuk fetch data dari API.
+   */
+  const {
+    data: filteredMovies,
+    isLoading: filteredLoading,
+    isError: filteredError,
+  } = useSearchQuery(
+    "filteredData",
+    selectedFilters,
     Type === "Movies" ? fetchFilteredMovies : fetchFilteredTVSeries,
     !!Type
   );
 
+  /**
+   * Mengupdate filter berdasarkan kategori yang dipilih pengguna.
+   * @param {string} category - Kategori filter (sortBy, genres, years, languages)
+   * @param {string|number} value - Nilai filter yang dipilih
+   */
   const handleFilterChange = (category, value) => {
     setSelectedFilters((prev) => {
       if (category === "sortBy") {
@@ -245,62 +277,50 @@ export default function FilterMovie({ Type }) {
             </DialogPanel>
           </div>
         </Dialog>
-
         <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-baseline justify-between border-b border-gray-200 pt-24 pb-6">
             <h1 className="text-4xl font-bold tracking-tight text-gray-900">
               {Type}
             </h1>
-
             <div className="flex items-center">
+              {/* Sort Menu */}
               <Menu as="div" className="relative inline-block text-left">
-                <div>
-                  <MenuButton className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900 cursor-pointer">
-                    Sort
-                    <ChevronDownIcon
-                      aria-hidden="true"
-                      className="-mr-1 ml-1 size-5 shrink-0 text-gray-400 group-hover:text-gray-500"
-                    />
-                  </MenuButton>
-                </div>
-
-                <MenuItems
-                  transition
-                  className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white ring-1 shadow-2xl ring-black/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
-                >
-                  <div className="py-1">
-                    {sortOptions.map((option) => (
-                      <MenuItem key={option.name}>
-                        <button
-                          onClick={() =>
-                            handleFilterChange("sortBy", option.value)
-                          }
-                          className="block w-40 px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                        >
-                          {option.name}
-                        </button>
-                      </MenuItem>
-                    ))}
-                  </div>
+                <MenuButton className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900 cursor-pointer">
+                  Sort
+                  <ChevronDownIcon className="-mr-1 ml-1 size-5 shrink-0 text-gray-400 group-hover:text-gray-500" />
+                </MenuButton>
+                <MenuItems className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
+                  {sortOptions.map((option) => (
+                    <MenuItem key={option.name}>
+                      <button
+                        onClick={() =>
+                          handleFilterChange("sortBy", option.value)
+                        }
+                        className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        {option.name}
+                      </button>
+                    </MenuItem>
+                  ))}
                 </MenuItems>
               </Menu>
+
+              {/* Button untuk membuka filter di tampilan mobile */}
               <button
                 type="button"
                 onClick={() => setMobileFiltersOpen(true)}
                 className="-m-2 ml-4 p-2 text-gray-400 hover:text-gray-500 sm:ml-6 lg:hidden"
               >
                 <span className="sr-only">Filters</span>
-                <FunnelIcon aria-hidden="true" className="size-5" />
+                <FunnelIcon className="size-5" />
               </button>
             </div>
           </div>
 
-          <section aria-labelledby="products-heading" className="pt-6 pb-24">
-            <h2 id="products-heading" className="sr-only">
-              Products
-            </h2>
-
+          {/* Film grid */}
+          <section className="pt-6 pb-24">
             <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-[1fr_5fr]">
+              {/* Sidebar Filter untuk desktop */}
               {/* Filters */}
               <form className="hidden lg:block">
                 {filters.map((section) => (
@@ -383,8 +403,13 @@ export default function FilterMovie({ Type }) {
               </form>
 
               {/* Film grid */}
+              {/* Komponen untuk menampilkan daftar film berdasarkan filter */}
               <div>
-                <CardMovie2 movies={filteredMovies} isLoading={filteredLoading} isError={filteredError} />
+                <CardMovie2
+                  movies={filteredMovies}
+                  isLoading={filteredLoading}
+                  isError={filteredError}
+                />
               </div>
             </div>
           </section>

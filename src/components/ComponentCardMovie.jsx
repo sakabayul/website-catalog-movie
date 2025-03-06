@@ -2,6 +2,16 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 
+/**
+ * Komponen CardMovie untuk menampilkan daftar film dalam bentuk kartu
+ * dengan fitur scroll horizontal dan navigasi ke halaman detail film.
+ * 
+ * @param {Object} props - Properti komponen
+ * @param {Array} props.movies - Daftar film yang akan ditampilkan
+ * @param {boolean} props.isLoading - Status loading saat mengambil data film
+ * @param {boolean} props.isError - Status error jika terjadi kesalahan saat fetching
+ * @param {string} props.query - Query pencarian film (jika ada)
+ */
 const CardMovie = ({ movies, isLoading, isError, query }) => {
   const scrollRef = React.useRef(null);
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
@@ -10,7 +20,7 @@ const CardMovie = ({ movies, isLoading, isError, query }) => {
 
   // Cek posisi scroll saat pertama kali dimuat & saat berubah
   React.useEffect(() => {
-    const scrollContainer = scrollRef.current; // Simpan dalam variabel lokal
+    const scrollContainer = scrollRef.current;
     const checkScroll = () => {
       if (scrollContainer) {
         setCanScrollLeft(scrollContainer.scrollLeft > 0);
@@ -30,8 +40,12 @@ const CardMovie = ({ movies, isLoading, isError, query }) => {
         scrollContainer.removeEventListener("scroll", checkScroll);
       }
     };
-  }, [movies]); // Dependensi tetap sama
+  }, [movies]);
 
+  /**
+   * Fungsi untuk menggulir daftar film ke kiri atau kanan
+   * @param {"left" | "right"} direction - Arah scroll
+   */
   const scroll = (direction) => {
     if (scrollRef.current) {
       const scrollAmount = 600; // Jumlah scroll dalam px
@@ -42,10 +56,15 @@ const CardMovie = ({ movies, isLoading, isError, query }) => {
     }
   };
 
+  /**
+   * Fungsi untuk menangani klik pada kartu film
+   * @param {Object} movie - Data film yang diklik
+   */
   const handleCardClick = (movie) => {
     navigate(`/about/${movie.id}`, { state: { movie } });
   };
 
+  // Jika sedang loading, tampilkan placeholder animasi
   if (isLoading) {
     return (
       <div className="relative">
@@ -64,11 +83,12 @@ const CardMovie = ({ movies, isLoading, isError, query }) => {
     );
   }
 
+  // Jika terjadi error saat mengambil data
   if (isError) return <p className="text-gray-500 text-center w-full">Terjadi kesalahan!</p>;
 
   return (
     <div className="relative">
-      {/* Tombol Scroll Kiri (Muncul hanya jika bisa scroll ke kiri) */}
+      {/* Tombol Scroll Kiri */}
       {canScrollLeft && (
         <button
           onClick={() => scroll("left")}
@@ -111,7 +131,7 @@ const CardMovie = ({ movies, isLoading, isError, query }) => {
         </div>
       </div>
 
-      {/* Tombol Scroll Kanan (Muncul hanya jika bisa scroll ke kanan) */}
+      {/* Tombol Scroll Kanan */}
       {canScrollRight && (
         <button
           onClick={() => scroll("right")}

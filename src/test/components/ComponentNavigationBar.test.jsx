@@ -24,7 +24,7 @@ describe("NavigationBar Component", () => {
         </MemoryRouter>
       );
   
-      expect(screen.getByAltText("Your Company")).toBeInTheDocument();
+      expect(screen.getByAltText("TMDB Logo")).toBeInTheDocument();
       
       // Cari elemen menu dengan lebih spesifik
       const movieLinks = screen.getAllByText("Movies");

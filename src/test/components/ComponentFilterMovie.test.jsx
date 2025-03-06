@@ -7,12 +7,12 @@ const Button = ({ label, onClick }) => {
 };
 
 describe("Button Component", () => {
-  it("renders correctly", () => {
+  it("Label dirender dengan benar", () => {
     render(<Button label="Click M" />);
     expect(screen.getByText("Click M")).toBeInTheDocument();
   });
 
-  it("calls onClick when clicked", async () => {
+  it("Memanggil onClick saat diklik", async () => {
     const handleClick = vi.fn();
     render(<Button label="Click Me" onClick={handleClick} />);
 

@@ -4,7 +4,7 @@ import { MemoryRouter } from "react-router-dom";
 import Footer from "../../components/ComponentFooter";
 
 describe("Footer Component", () => {
-  it("renders the MovieApp title", () => {
+  it("Menampilkan judul MovieApp", () => {
     render(
       <MemoryRouter>
         <Footer />
@@ -13,7 +13,7 @@ describe("Footer Component", () => {
     expect(screen.getByText("MovieApp")).toBeInTheDocument();
   });
 
-  it("renders navigation links", () => {
+  it("Menampilkan tautan navigasi", () => {
     render(
       <MemoryRouter>
         <Footer />
@@ -25,7 +25,7 @@ describe("Footer Component", () => {
     expect(screen.getByText("About Us")).toBeInTheDocument();
   });
 
-  it("renders contact information", () => {
+  it("Menyajikan informasi kontak", () => {
     render(
       <MemoryRouter>
         <Footer />
@@ -35,7 +35,7 @@ describe("Footer Component", () => {
     expect(screen.getByText("+62 812-3456-7890")).toBeInTheDocument();
   });
 
-  it("renders social media section", () => {
+  it("Membuat bagian media sosial", () => {
     render(
       <MemoryRouter>
         <Footer />
@@ -45,7 +45,7 @@ describe("Footer Component", () => {
     expect(screen.getByText("Website")).toBeInTheDocument();
   });
 
-  it("renders copyright text", () => {
+  it("Menampilkan teks hak cipta", () => {
     render(
       <MemoryRouter>
         <Footer />

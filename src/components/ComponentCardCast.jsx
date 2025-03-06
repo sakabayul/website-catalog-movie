@@ -3,21 +3,31 @@ import useSearchQuery from "../services/useSearchQuery";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { fetchMovieCredits } from "../services/movieApi";
 
+/**
+ * Komponen CardCast menampilkan daftar pemeran (cast) dari sebuah film.
+ * Menyediakan fitur scrolling horizontal dan indikator loading saat data sedang diambil.
+ *
+ * @param {Object} props - Properti komponen
+ * @param {number} props.id - ID film yang akan diambil daftar pemerannya
+ */
 const CardCast = ({ id }) => {
-  const scrollRef = React.useRef(null);
-  const [canScrollLeft, setCanScrollLeft] = React.useState(false);
-  const [canScrollRight, setCanScrollRight] = React.useState(false);
+  const scrollRef = React.useRef(null); // Referensi untuk elemen scroll container
+  const [canScrollLeft, setCanScrollLeft] = React.useState(false); // Cek apakah bisa scroll ke kiri
+  const [canScrollRight, setCanScrollRight] = React.useState(false); // Cek apakah bisa scroll ke kanan
 
-  // Urutan Fungsi = queryKey, fetchFunction, query, bolean = true
+  // Fetch data pemeran menggunakan custom hook useSearchQuery
   const {
     data: cast,
     isLoading: isLoadingCast,
     isError: isErrorCast,
   } = useSearchQuery("movieCredits", id, fetchMovieCredits);
 
-  // Cek posisi scroll saat pertama kali dimuat & saat berubah
+  /**
+   * Cek apakah elemen bisa di-scroll ke kiri atau ke kanan,
+   * lalu perbarui state berdasarkan posisi scroll.
+   */
   React.useEffect(() => {
-    const scrollContainer = scrollRef.current; // Simpan dalam variabel lokal
+    const scrollContainer = scrollRef.current;
     const checkScroll = () => {
       if (scrollContainer) {
         setCanScrollLeft(scrollContainer.scrollLeft > 0);
@@ -29,7 +39,7 @@ const CardCast = ({ id }) => {
     };
 
     if (scrollContainer) {
-      checkScroll(); // Cek posisi awal
+      checkScroll(); // Periksa posisi scroll saat pertama kali dimuat
       scrollContainer.addEventListener("scroll", checkScroll);
     }
 
@@ -38,18 +48,24 @@ const CardCast = ({ id }) => {
         scrollContainer.removeEventListener("scroll", checkScroll);
       }
     };
-  }, [cast]); // Dependensi tetap sama
+  }, [cast]);
 
+  /**
+   * Fungsi untuk menggerakkan scroll secara horizontal.
+   *
+   * @param {"left" | "right"} direction - Arah scroll
+   */
   const scroll = (direction) => {
     if (scrollRef.current) {
-      const scrollAmount = 600; // Jumlah scroll dalam px
+      const scrollAmount = 600; // Jarak scroll dalam pixel
       scrollRef.current.scrollBy({
         left: direction === "left" ? -scrollAmount : scrollAmount,
-        behavior: "smooth",
+        behavior: "smooth", // Animasi scroll
       });
     }
   };
 
+  // Jika terjadi error saat fetch data, tampilkan pesan error
   if (isErrorCast)
     return (
       <p className="text-gray-500 text-center w-full">Terjadi kesalahan!</p>
@@ -57,7 +73,7 @@ const CardCast = ({ id }) => {
 
   return (
     <div className="relative">
-      {/* Tombol Scroll Kiri (Muncul hanya jika bisa scroll ke kiri) */}
+      {/* Tombol Scroll Kiri (Muncul jika bisa scroll ke kiri) */}
       {canScrollLeft && (
         <button
           onClick={() => scroll("left")}
@@ -70,6 +86,7 @@ const CardCast = ({ id }) => {
         ref={scrollRef}
         className="flex overflow-x-auto space-x-4 p-2 snap-x snap-mandatory scrollbar-hide"
       >
+        {/* Tampilkan indikator loading saat data sedang diambil */}
         {isLoadingCast ? (
           <div className="flex space-x-4 p-2">
             {Array(8)
@@ -107,7 +124,7 @@ const CardCast = ({ id }) => {
         )}
       </div>
 
-      {/* Tombol Scroll Kanan (Muncul hanya jika bisa scroll ke kanan) */}
+      {/* Tombol Scroll Kanan (Muncul jika bisa scroll ke kanan) */}
       {canScrollRight && (
         <button
           onClick={() => scroll("right")}

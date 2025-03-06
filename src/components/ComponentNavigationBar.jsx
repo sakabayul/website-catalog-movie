@@ -7,13 +7,25 @@ import { Link, useLocation } from "react-router-dom";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import MovieSearch from "./ComponentMovieSearch";
 
+/**
+ * Fungsi untuk menggabungkan kelas CSS menjadi satu string
+ * @param {...string} classes - Daftar kelas CSS
+ * @returns {string} - String kelas yang telah difilter dan digabung
+ */
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
+/**
+ * Komponen NavigationBar menampilkan navigasi utama aplikasi.
+ * @param {string} query - Nilai query pencarian film.
+ * @param {Function} setQuery - Fungsi untuk mengupdate query pencarian.
+ * @returns {JSX.Element} - Elemen JSX untuk navigasi.
+ */
 const NavigationBar = ({ query, setQuery }) => {
   const location = useLocation();
 
+  // Daftar menu navigasi dengan status aktif berdasarkan lokasi saat ini
   const navigation = [
     { name: "Movies", href: "#/movie", current: location.pathname === "/movie" },
     { name: "TV Shows", href: "#/tv-shows", current: location.pathname === "/tv-shows" },
@@ -23,31 +35,29 @@ const NavigationBar = ({ query, setQuery }) => {
     <Disclosure as="nav" className="bg-gray-800">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
+          {/* Tombol menu untuk tampilan mobile */}
           <div className="inset-y-0 left-0 flex items-center sm:hidden">
-            {/* Mobile menu button*/}
             <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-white focus:outline-hidden focus:ring-inset">
               <span className="absolute -inset-0.5" />
               <span className="sr-only">Open main menu</span>
-              <Bars3Icon
-                aria-hidden="true"
-                className="block size-6 group-data-open:hidden"
-              />
-              <XMarkIcon
-                aria-hidden="true"
-                className="hidden size-6 group-data-open:block"
-              />
+              <Bars3Icon aria-hidden="true" className="block size-6 group-data-open:hidden" />
+              <XMarkIcon aria-hidden="true" className="hidden size-6 group-data-open:block" />
             </DisclosureButton>
           </div>
+          
+          {/* Logo dan menu utama */}
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
             <div className="flex shrink-0 items-center">
-            <Link to="/">
-              <img
-                alt="Your Company"
-                src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg"
-                className="h-4 w-auto cursor-pointer"
-              />
-            </Link>
+              <Link to="/">
+                <img
+                  alt="TMDB Logo"
+                  src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg"
+                  className="h-4 w-auto cursor-pointer"
+                />
+              </Link>
             </div>
+            
+            {/* Menu navigasi desktop */}
             <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4">
                 {navigation.map((item) => (
@@ -68,12 +78,15 @@ const NavigationBar = ({ query, setQuery }) => {
               </div>
             </div>
           </div>
+          
+          {/* Komponen pencarian film */}
           <div className="inset-y-0 right-0 flex items-center">
-            <MovieSearch query={query} setQuery={setQuery}/>
+            <MovieSearch query={query} setQuery={setQuery} />
           </div>
         </div>
       </div>
 
+      {/* Menu navigasi untuk tampilan mobile */}
       <DisclosurePanel className="sm:hidden">
         <div className="space-y-1 px-2 pt-2 pb-3">
           {navigation.map((item) => (

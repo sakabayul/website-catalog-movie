@@ -2,30 +2,46 @@ import React from "react";
 import { fetchMovieMedia, fetchTvMedia } from "../services/movieApi";
 import useSearchQuery from "../services/useSearchQuery";
 
+/**
+ * Komponen MediaFilm menampilkan berbagai media terkait film atau serial TV,
+ * termasuk video, backdrops, dan poster, berdasarkan kategori yang dipilih.
+ *
+ * Props:
+ * @param {string} id - ID dari film atau serial TV.
+ * @param {object} movie - Objek film atau serial TV yang berisi informasi seperti first_air_date.
+ */
 const MediaFilm = ({ id, movie }) => {
+  // Daftar kategori media yang tersedia
   const categories = ["Most Popular", "Videos", "Backdrops", "Posters"];
   const [isMobile, setIsMobile] = React.useState(false);
   const [activeCategory, setActiveCategory] = React.useState("Most Popular");
   const [selectedVideo, setSelectedVideo] = React.useState(null);
 
+  // Menyesuaikan UI berdasarkan ukuran layar
   React.useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 640); // Jika layar < 640px (Mobile)
+      setIsMobile(window.innerWidth < 640); // Jika layar < 640px, dianggap sebagai tampilan mobile
     };
 
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Menentukan fungsi pengambilan data berdasarkan tipe (movie atau TV show)
   const fetchFunction = movie.first_air_date ? fetchTvMedia : fetchMovieMedia;
 
-  // Urutan Fungsi = queryKey, query, fetchFunction, bolean = true
+  /**
+   * Menggunakan custom hook useSearchQuery untuk mengambil data media
+   * Urutan parameter: queryKey, query, fetchFunction
+   */
   const {
     data: media,
     isLoading: isLoadingMedia,
     isError: isErrorMedia,
   } = useSearchQuery("media", id, fetchFunction);
 
+  // Menampilkan indikator loading saat data sedang diambil
   if (isLoadingMedia) {
     return (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -40,17 +56,16 @@ const MediaFilm = ({ id, movie }) => {
       </div>
     );
   }
+
+  // Menampilkan pesan error jika terjadi kesalahan saat mengambil data
   if (isErrorMedia)
-    return (
-      <p className="text-gray-500 text-center w-full">Terjadi kesalahan!</p>
-    );
+    return <p className="text-gray-500 text-center w-full">Terjadi kesalahan!</p>;
 
   return (
     <>
       <div className="mt-4">
-        {/* Tabs */}
+        {/* Menampilkan kategori sebagai Select untuk Mobile dan Buttons untuk Desktop */}
         {isMobile ? (
-          // Mobile: Gunakan Select Option
           <select
             value={activeCategory}
             onChange={(e) => setActiveCategory(e.target.value)}
@@ -63,7 +78,6 @@ const MediaFilm = ({ id, movie }) => {
             ))}
           </select>
         ) : (
-          // Desktop: Gunakan Buttons
           <div className="flex overflow-x-auto space-x-2 pb-2">
             {categories.map((category) => (
               <button
@@ -82,7 +96,7 @@ const MediaFilm = ({ id, movie }) => {
         )}
       </div>
 
-      {/* Konten Berdasarkan Tab */}
+      {/* Menampilkan konten berdasarkan kategori yang dipilih */}
       <div className="mt-4">
         {activeCategory === "Most Popular" && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -91,10 +105,7 @@ const MediaFilm = ({ id, movie }) => {
                 No most popular available.
               </p>
             ) : (
-              [
-                ...(media?.backdrops?.slice(0, 4) || []),
-                ...(media?.posters?.slice(0, 4) || []),
-              ].map((image, index) => (
+              [...(media?.backdrops?.slice(0, 4) || []), ...(media?.posters?.slice(0, 4) || [])].map((image, index) => (
                 <img
                   key={index}
                   src={`https://image.tmdb.org/t/p/w500${image.file_path}`}
@@ -133,7 +144,7 @@ const MediaFilm = ({ id, movie }) => {
           </div>
         )}
 
-        {/* Modal Video */}
+        {/* Menampilkan modal video */}
         {selectedVideo && (
           <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
             <div className="relative w-full max-w-3xl">
@@ -143,7 +154,7 @@ const MediaFilm = ({ id, movie }) => {
               >
                 ✖
               </button>
-              <div className="pt-16 mx-3 bg-black">
+              <div className="pt-16 mx-3 bg-black rounded-lg md:rounded-md">
                 <iframe
                   src={`https://www.youtube.com/embed/${selectedVideo}`}
                   title="Selected Video"
