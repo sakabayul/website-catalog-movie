@@ -15,8 +15,8 @@ const NavigationBar = ({ query, setQuery }) => {
   const location = useLocation();
 
   const navigation = [
-    { name: "Movies", href: "/movie", current: location.pathname === "/movie" },
-    { name: "TV Shows", href: "/tv-shows", current: location.pathname === "/tv-shows" },
+    { name: "Movies", href: "#/movie", current: location.pathname === "/movie" },
+    { name: "TV Shows", href: "#/tv-shows", current: location.pathname === "/tv-shows" },
   ];
 
   return (
@@ -51,9 +51,9 @@ const NavigationBar = ({ query, setQuery }) => {
             <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4">
                 {navigation.map((item) => (
-                  <Link
+                  <a
                     key={item.name}
-                    to={item.href}
+                    href={item.href}
                     aria-current={item.current ? "page" : undefined}
                     className={classNames(
                       item.current
@@ -63,7 +63,7 @@ const NavigationBar = ({ query, setQuery }) => {
                     )}
                   >
                     {item.name}
-                  </Link>
+                  </a>
                 ))}
               </div>
             </div>
@@ -79,8 +79,8 @@ const NavigationBar = ({ query, setQuery }) => {
           {navigation.map((item) => (
             <DisclosureButton
               key={item.name}
-              as="Link"
-              to={item.href}
+              as="a"
+              href={item.href}
               aria-current={item.current ? "page" : undefined}
               className={classNames(
                 item.current
