@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useParams, useLocation } from "react-router-dom";
 import MediaFilm from "../components/ComponentMediaFilm";
 import CardCast from "../components/ComponentCardCast";
-import { fetchGenres } from "../services/movieApi";
+import { fetchGenres } from "../api/movieApi";
 
 const PageAbout = () => {
   // Mengambil ID dari URL menggunakan useParams
@@ -117,7 +117,7 @@ const PageAbout = () => {
         {/* Bagian Tambahan: Pemeran dan Media */}
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-xl font-bold mt-6">Top Billed Cast</h2>
-          <CardCast id={id} />
+          <CardCast id={id} movie={movie} />
 
           <h2 className="text-xl font-bold mt-6">Media</h2>
           <MediaFilm id={id} movie={movie} />

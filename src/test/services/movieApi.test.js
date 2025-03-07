@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { apiClient } from "../../api/filmApi";
+import { apiClient } from "../../services/request";
 import {
   fetchSearchMovies,
   fetchTrendingMovies,
@@ -7,14 +7,15 @@ import {
   fetchTopRatedMovies,
   fetchFilteredMovies,
   fetchFilteredTVSeries,
-  fetchMovieCredits,
+  fetchMovieCast,
+  fetchTvCast,
   fetchMovieMedia,
   fetchTvMedia,
   fetchGenres,
-} from "../../services/movieApi";
+} from "../../api/movieApi";
 
 // Mock apiClient
-vi.mock("../../api/filmApi", () => ({
+vi.mock("../../services/request", () => ({
   apiClient: {
     get: vi.fn(),
   },
@@ -25,14 +26,59 @@ beforeEach(() => {
 });
 
 describe("movieApi.js", () => {
-  const mockMovies = [{ id: 1, title: "Movie A" }, { id: 2, title: "Movie B" }];
-  
-  it("fetchSearchMovies - berhasil mengambil data", async () => {
-    apiClient.get.mockResolvedValue({ data: { results: mockMovies } });
+  const mockMovies = [
+    { id: 1, title: "Movie A" },
+    { id: 2, title: "Movie B" },
+  ];
 
-    const result = await fetchSearchMovies("Inception");
-    expect(apiClient.get).toHaveBeenCalledWith("/search/movie", { params: { query: "Inception" } });
-    expect(result).toEqual(mockMovies);
+  it("harus mengembalikan dan menggabungkan hasil pencarian movie dan TV show", async () => {
+    const mockMovies = {
+      data: {
+        results: [
+          { id: 1, title: "Movie A", vote_average: 8.0 },
+          { id: 2, title: "Movie B", vote_average: 7.5 },
+        ],
+      },
+    };
+
+    const mockTvShows = {
+      data: {
+        results: [
+          { id: 3, name: "TV Show A", vote_average: 8.5 },
+          { id: 4, name: "TV Show B", vote_average: 6.5 },
+        ],
+      },
+    };
+
+    apiClient.get
+      .mockResolvedValueOnce(mockMovies) // Mock untuk search movie
+      .mockResolvedValueOnce(mockTvShows); // Mock untuk search TV show
+
+    const results = await fetchSearchMovies("Avengers");
+
+    expect(apiClient.get).toHaveBeenCalledTimes(2);
+    expect(apiClient.get).toHaveBeenCalledWith("/search/movie", {
+      params: { query: "Avengers" },
+    });
+    expect(apiClient.get).toHaveBeenCalledWith("/search/tv", {
+      params: { query: "Avengers" },
+    });
+
+    expect(results).toEqual([
+      { id: 3, name: "TV Show A", vote_average: 8.5, type: "tv" },
+      { id: 1, title: "Movie A", vote_average: 8.0, type: "movie" },
+      { id: 2, title: "Movie B", vote_average: 7.5, type: "movie" },
+      { id: 4, name: "TV Show B", vote_average: 6.5, type: "tv" },
+    ]); // Hasil diurutkan berdasarkan vote_average desc
+  });
+
+  it("harus mengembalikan array kosong jika terjadi error", async () => {
+    apiClient.get.mockRejectedValueOnce(new Error("Network Error"));
+
+    const results = await fetchSearchMovies("Avengers");
+
+    expect(apiClient.get).toHaveBeenCalledTimes(2);
+    expect(results).toEqual([]);
   });
 
   it("fetchTrendingMovies - berhasil mengambil data", async () => {
@@ -79,17 +125,23 @@ describe("movieApi.js", () => {
     expect(result).toEqual(mockMovies);
   });
 
-  it("fetchMovieCredits - berhasil mengambil data", async () => {
-    const mockCredits = [{ id: 1, name: "Actor A" }, { id: 2, name: "Actor B" }];
+  it("castCredits - berhasil mengambil data", async () => {
+    const mockCredits = [
+      { id: 1, name: "Actor A" },
+      { id: 2, name: "Actor B" },
+    ];
     apiClient.get.mockResolvedValue({ data: { cast: mockCredits } });
 
-    const result = await fetchMovieCredits(123);
+    const result = await fetchMovieCast(123);
     expect(apiClient.get).toHaveBeenCalledWith("/movie/123/credits");
     expect(result).toEqual(mockCredits);
   });
 
   it("fetchMovieMedia - berhasil mengambil data", async () => {
-    const mockImages = { backdrops: [{ file_path: "/backdrop.jpg" }], posters: [{ file_path: "/poster.jpg" }] };
+    const mockImages = {
+      backdrops: [{ file_path: "/backdrop.jpg" }],
+      posters: [{ file_path: "/poster.jpg" }],
+    };
     const mockVideos = { results: [{ type: "Trailer", key: "abcd1234" }] };
 
     apiClient.get
@@ -107,7 +159,10 @@ describe("movieApi.js", () => {
   });
 
   it("fetchTvMedia - berhasil mengambil data", async () => {
-    const mockImages = { backdrops: [{ file_path: "/backdrop.jpg" }], posters: [{ file_path: "/poster.jpg" }] };
+    const mockImages = {
+      backdrops: [{ file_path: "/backdrop.jpg" }],
+      posters: [{ file_path: "/poster.jpg" }],
+    };
     const mockVideos = { results: [{ type: "Trailer", key: "xyz9876" }] };
 
     apiClient.get
@@ -125,7 +180,10 @@ describe("movieApi.js", () => {
   });
 
   it("fetchGenres - berhasil mengambil data", async () => {
-    const mockGenres = [{ id: 28, name: "Action" }, { id: 35, name: "Comedy" }];
+    const mockGenres = [
+      { id: 28, name: "Action" },
+      { id: 35, name: "Comedy" },
+    ];
     apiClient.get.mockResolvedValue({ data: { genres: mockGenres } });
 
     const result = await fetchGenres("movie");
@@ -145,9 +203,11 @@ describe("movieApi.js", () => {
   it("fetchMovieCredits - menangani error", async () => {
     apiClient.get.mockRejectedValue(new Error("API Error"));
 
-    const result = await fetchMovieCredits(123);
+    const result1 = await fetchMovieCast(123);
+    const result2 = await fetchTvCast(123);
     expect(apiClient.get).toHaveBeenCalled();
-    expect(result).toEqual([]); // Pastikan return array kosong saat error
+    expect(result1).toEqual([]); // Pastikan return array kosong saat error
+    expect(result2).toEqual([]); // Pastikan return array kosong saat error
   });
 
   it("fetchGenres - menangani error", async () => {

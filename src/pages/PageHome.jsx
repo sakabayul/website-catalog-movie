@@ -6,7 +6,7 @@ import {
   fetchTrendingMovies,
   fetchPopularMovies,
   fetchTopRatedMovies, // Fetch untuk film dengan rating tertinggi
-} from "../services/movieApi";
+} from "../api/movieApi";
 import useSearchQuery from "../services/useSearchQuery";
 
 const PageHome = ({ query }) => {

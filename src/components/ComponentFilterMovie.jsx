@@ -13,7 +13,7 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import {
   fetchFilteredMovies,
   fetchFilteredTVSeries,
-} from "../services/movieApi";
+} from "../api/movieApi";
 import useSearchQuery from "../services/useSearchQuery";
 import CardMovie2 from "./ComponentCardMovie2";
 import {

@@ -1,5 +1,5 @@
 import React from "react";
-import { fetchMovieMedia, fetchTvMedia } from "../services/movieApi";
+import { fetchMovieMedia, fetchTvMedia } from "../api/movieApi";
 import useSearchQuery from "../services/useSearchQuery";
 
 /**

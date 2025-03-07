@@ -117,7 +117,7 @@ const CardMovie = ({ movies, isLoading, isError, query }) => {
                   alt={movie.title || "Unknown Title"}
                   className="w-full h-64 object-cover"
                 />
-                <div className="p-3">
+                <div className="p-3 w-60">
                   <h3 className="text-md font-semibold truncate">{movie.title || "Unknown Title"}</h3>
                   <p className="text-sm text-gray-400">
                     ⭐ {movie.vote_average.toFixed(1) || "N/A"} | 📅 {movie.release_date?.split("-")[0] || "Unknown"}

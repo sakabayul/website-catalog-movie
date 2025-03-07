@@ -1,7 +1,7 @@
 import React from "react";
 import useSearchQuery from "../services/useSearchQuery";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-import { fetchMovieCredits } from "../services/movieApi";
+import { fetchTvCast, fetchMovieCast } from "../api/movieApi";
 
 /**
  * Komponen CardCast menampilkan daftar pemeran (cast) dari sebuah film.
@@ -10,17 +10,18 @@ import { fetchMovieCredits } from "../services/movieApi";
  * @param {Object} props - Properti komponen
  * @param {number} props.id - ID film yang akan diambil daftar pemerannya
  */
-const CardCast = ({ id }) => {
+const CardCast = ({ id, movie }) => {
   const scrollRef = React.useRef(null); // Referensi untuk elemen scroll container
   const [canScrollLeft, setCanScrollLeft] = React.useState(false); // Cek apakah bisa scroll ke kiri
   const [canScrollRight, setCanScrollRight] = React.useState(false); // Cek apakah bisa scroll ke kanan
+  const fetchFunction = movie.first_air_date ? fetchTvCast : fetchMovieCast;
 
   // Fetch data pemeran menggunakan custom hook useSearchQuery
   const {
     data: cast,
     isLoading: isLoadingCast,
     isError: isErrorCast,
-  } = useSearchQuery("movieCredits", id, fetchMovieCredits);
+  } = useSearchQuery("movieAndTvCredits", id, fetchFunction);
 
   /**
    * Cek apakah elemen bisa di-scroll ke kiri atau ke kanan,
@@ -102,7 +103,7 @@ const CardCast = ({ id }) => {
               ))}
           </div>
         ) : cast && cast.length > 0 ? (
-          cast.slice(0, 10).map((actor) => (
+          cast.slice(0, 30).map((actor) => (
             <div
               key={actor.id}
               className="w-32 flex-shrink-0 text-center snap-center bg-white p-2 rounded-lg shadow-md"
@@ -116,7 +117,7 @@ const CardCast = ({ id }) => {
                 alt={actor.name}
                 className="rounded-lg object-cover w-32 h-40"
               />
-              <p className="text-sm mt-2 font-medium">{actor.name}</p>
+              <p className="text-sm mt-2 font-medium">{actor.name || "Unknow"}<br />({actor.character || "Unknow"})</p>
             </div>
           ))
         ) : (
