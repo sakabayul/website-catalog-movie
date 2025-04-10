@@ -28,7 +28,7 @@ const NavigationBar = ({ query, setQuery }) => {
   // Daftar menu navigasi dengan status aktif berdasarkan lokasi saat ini
   const navigation = [
     { name: "Movies", href: "#/movie", current: location.pathname === "/movie" },
-    { name: "TV Shows", href: "#/tv-shows", current: location.pathname === "/tv-shows" },
+    { name: "TV Shows", href: "#/tv", current: location.pathname === "/tv" },
   ];
 
   return (

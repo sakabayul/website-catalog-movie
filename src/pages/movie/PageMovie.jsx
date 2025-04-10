@@ -1,4 +1,4 @@
-import FilterMovie from "../components/ComponentFilterMovie";
+import FilterMovie from "../../components/filter/ComponentFilterFilm";
 
 /**
  * Komponen `PageMovie` bertanggung jawab untuk menampilkan halaman daftar film.
@@ -12,7 +12,7 @@ const PageMovie = () => {
   return (
     <>
       {/* Menampilkan komponen FilterMovie dengan properti Type yang diatur ke "Movies" */}
-      <FilterMovie Type={"Movies"} />
+      <FilterMovie type={"movie"} />
     </>
   );
 };

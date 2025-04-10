@@ -60,8 +60,12 @@ const CardMovie = ({ movies, isLoading, isError, query }) => {
    * Fungsi untuk menangani klik pada kartu film
    * @param {Object} movie - Data film yang diklik
    */
-  const handleCardClick = (movie) => {
-    navigate(`/about/${movie.id}`, { state: { movie } });
+  const handleCardClick = (film) => {
+    if (film.title) {
+      navigate(`/movie/${film.id}`, { state: { film } });
+    } else {
+      navigate(`/tv/${film.id}`, { state: { film } });
+    }
   };
 
   // Jika sedang loading, tampilkan placeholder animasi

@@ -1,10 +1,10 @@
 import React from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import NavigationBar from './components/ComponentNavigationBar';
-import PageHome from './pages/PageHome';
-import PageMovie from './pages/PageMovie';
-import PageTVShow from './pages/PageTVShow';
-import PageAbout from './pages/PageAbout';
+import PageHome from './pages/home/PageHome';
+import PageMovie from './pages/movie/PageMovie';
+import PageTVShow from './pages/tv/PageTVShow';
+import PageAbout from './pages/about/PageAbout';
 import Footer from './components/ComponentFooter';
 
 /**
@@ -30,10 +30,11 @@ const App = () => {
         <Route path="/movie" element={<PageMovie />} />
         
         {/* Halaman untuk menampilkan daftar TV Shows */}
-        <Route path="/tv-shows" element={<PageTVShow />} />
+        <Route path="/tv" element={<PageTVShow />} />
         
         {/* Halaman About yang menerima parameter dinamis `id` */}
-        <Route path="/about/:id" element={<PageAbout />} />
+        <Route path="/movie/:id" element={<PageAbout />} />
+        <Route path="/tv/:id" element={<PageAbout />} />
       </Routes>
 
       {/* Footer yang muncul di semua halaman */}

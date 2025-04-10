@@ -1,4 +1,4 @@
-import FilterMovie from "../components/ComponentFilterMovie";
+import FilterMovie from "../../components/filter/ComponentFilterFilm";
 
 /**
  * Komponen `PageTVShow` bertanggung jawab untuk menampilkan halaman daftar TV Shows.
@@ -12,7 +12,7 @@ const PageTVShow = () => {
   return (
     <>
       {/* Menampilkan komponen FilterMovie dengan properti Type yang diatur ke "TV Shows" */}
-      <FilterMovie Type={"TV Shows"} />
+      <FilterMovie type={"tv"} />
     </>
   );
 };

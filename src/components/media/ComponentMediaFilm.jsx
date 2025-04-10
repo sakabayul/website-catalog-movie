@@ -1,6 +1,5 @@
 import React from "react";
-import { fetchMovieMedia, fetchTvMedia } from "../api/movieApi";
-import useSearchQuery from "../services/useSearchQuery";
+import componentMediaFilm from "./component-media-film";
 
 /**
  * Komponen MediaFilm menampilkan berbagai media terkait film atau serial TV,
@@ -10,39 +9,53 @@ import useSearchQuery from "../services/useSearchQuery";
  * @param {string} id - ID dari film atau serial TV.
  * @param {object} movie - Objek film atau serial TV yang berisi informasi seperti first_air_date.
  */
-const MediaFilm = ({ id, movie }) => {
+const MediaFilm = ({ id, type }) => {
   // Daftar kategori media yang tersedia
   const categories = ["Most Popular", "Videos", "Backdrops", "Posters"];
   const [isMobile, setIsMobile] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [isError, setIsError] = React.useState(false);
   const [activeCategory, setActiveCategory] = React.useState("Most Popular");
   const [selectedVideo, setSelectedVideo] = React.useState(null);
+  const [movies, setMovies] = React.useState({
+    mediaFilms: []
+  });
+
+  const fetchData = React.useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setIsError(false);
+      const rslt = await componentMediaFilm(id, type);
+      if (rslt.ret === 0) {
+        setMovies({
+          mediaFilms: rslt.resultData
+        });
+      } else {
+        console.warn("Message:", rslt.msg);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      setIsError(true);
+      console.error("Terjadi kesalahan:", error);
+    } finally {
+      setIsLoading(false);
+      setIsError(false);
+    }
+  }, [id, type]);
 
   // Menyesuaikan UI berdasarkan ukuran layar
   React.useEffect(() => {
+    fetchData();
     const handleResize = () => {
       setIsMobile(window.innerWidth < 640); // Jika layar < 640px, dianggap sebagai tampilan mobile
     };
-
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [fetchData]);
+  const media = movies.mediaFilms;
 
-  // Menentukan fungsi pengambilan data berdasarkan tipe (movie atau TV show)
-  const fetchFunction = movie.first_air_date ? fetchTvMedia : fetchMovieMedia;
-
-  /**
-   * Menggunakan custom hook useSearchQuery untuk mengambil data media
-   * Urutan parameter: queryKey, query, fetchFunction
-   */
-  const {
-    data: media,
-    isLoading: isLoadingMedia,
-    isError: isErrorMedia,
-  } = useSearchQuery("media", id, fetchFunction);
-
-  // Menampilkan indikator loading saat data sedang diambil
-  if (isLoadingMedia) {
+  if (isLoading) {
     return (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {Array(4)
@@ -58,8 +71,7 @@ const MediaFilm = ({ id, movie }) => {
   }
 
   // Menampilkan pesan error jika terjadi kesalahan saat mengambil data
-  if (isErrorMedia)
-    return <p className="text-gray-500 text-center w-full">Terjadi kesalahan!</p>;
+  if (isError) return <p className="text-gray-500 text-center w-full">Terjadi kesalahan!</p>;
 
   return (
     <>

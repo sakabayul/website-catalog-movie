@@ -55,11 +55,11 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-2">
                 <TvIcon className="w-5 h-5 text-gray-400" />
-                <Link to="/tv-shows" className="hover:text-white">TV Shows</Link>
+                <Link to="/tv" className="hover:text-white">TV Shows</Link>
               </li>
               <li className="flex items-center gap-2">
                 <InformationCircleIcon className="w-5 h-5 text-gray-400" />
-                <Link className="hover:text-white cursor-pointer">About Us</Link>
+                <p className="hover:text-white cursor-pointer">About Us</p>
               </li>
             </ul>
           </div>

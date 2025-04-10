@@ -1,7 +1,6 @@
 import React from "react";
-import useSearchQuery from "../services/useSearchQuery";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-import { fetchTvCast, fetchMovieCast } from "../api/movieApi";
+import componentCardCast from "./component-card-cast";
 
 /**
  * Komponen CardCast menampilkan daftar pemeran (cast) dari sebuah film.
@@ -10,24 +9,45 @@ import { fetchTvCast, fetchMovieCast } from "../api/movieApi";
  * @param {Object} props - Properti komponen
  * @param {number} props.id - ID film yang akan diambil daftar pemerannya
  */
-const CardCast = ({ id, movie }) => {
+const CardCast = ({ id, type }) => {
   const scrollRef = React.useRef(null); // Referensi untuk elemen scroll container
   const [canScrollLeft, setCanScrollLeft] = React.useState(false); // Cek apakah bisa scroll ke kiri
   const [canScrollRight, setCanScrollRight] = React.useState(false); // Cek apakah bisa scroll ke kanan
-  const fetchFunction = movie.first_air_date ? fetchTvCast : fetchMovieCast;
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [isError, setIsError] = React.useState(false);
+  const [fetchDataCast, setFetchDataCast] = React.useState({
+    castFilms: []
+  });
 
-  // Fetch data pemeran menggunakan custom hook useSearchQuery
-  const {
-    data: cast,
-    isLoading: isLoadingCast,
-    isError: isErrorCast,
-  } = useSearchQuery("movieAndTvCredits", id, fetchFunction);
+  const fetchData = React.useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setIsError(false);
+      const rslt = await componentCardCast(id, type);
+      if (rslt.ret === 0) {
+        setFetchDataCast({
+          castFilms: rslt.castFilms
+        });
+      } else {
+        console.warn("Message:", rslt.msg);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      setIsError(true);
+      console.error("Terjadi kesalahan:", error);
+    } finally {
+      setIsLoading(false);
+      setIsError(false);
+    }
+  }, [id, type]);
+  const cast = fetchDataCast.castFilms;
 
   /**
    * Cek apakah elemen bisa di-scroll ke kiri atau ke kanan,
    * lalu perbarui state berdasarkan posisi scroll.
    */
   React.useEffect(() => {
+    fetchData();
     const scrollContainer = scrollRef.current;
     const checkScroll = () => {
       if (scrollContainer) {
@@ -49,7 +69,7 @@ const CardCast = ({ id, movie }) => {
         scrollContainer.removeEventListener("scroll", checkScroll);
       }
     };
-  }, [cast]);
+  }, [fetchData]);
 
   /**
    * Fungsi untuk menggerakkan scroll secara horizontal.
@@ -67,7 +87,7 @@ const CardCast = ({ id, movie }) => {
   };
 
   // Jika terjadi error saat fetch data, tampilkan pesan error
-  if (isErrorCast)
+  if (isError)
     return (
       <p className="text-gray-500 text-center w-full">Terjadi kesalahan!</p>
     );
@@ -88,7 +108,7 @@ const CardCast = ({ id, movie }) => {
         className="flex overflow-x-auto space-x-4 p-2 snap-x snap-mandatory scrollbar-hide"
       >
         {/* Tampilkan indikator loading saat data sedang diambil */}
-        {isLoadingCast ? (
+        {isLoading ? (
           <div className="flex space-x-4 p-2">
             {Array(8)
               .fill(0)

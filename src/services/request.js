@@ -1,18 +1,28 @@
 import axios from "axios";
 
 // Mengambil API Key dan Base URL dari environment variables
+const NODE_ENV = import.meta.env.VITE_NODE_ENV;
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const BASE_URL = import.meta.env.VITE_TMDB_BASE_URL;
 
+let apiClient;
 // Membuat instance Axios dengan konfigurasi dasar
-export const apiClient = axios.create({
-  baseURL: BASE_URL, // Base URL untuk semua request API
-  params: {
-    api_key: API_KEY, // API key yang diperlukan untuk autentikasi TMDB API
-    language: "en-US", // Default bahasa untuk response
-    include_image_language: "en,null", // Menyertakan bahasa gambar dalam response
-  },
-});
+if (NODE_ENV === "development") {
+  apiClient = axios.create({
+    baseURL: BASE_URL, // Base URL untuk semua request API
+  });
+} else if (NODE_ENV === "production") {
+  apiClient = axios.create({
+    baseURL: BASE_URL, // Base URL untuk semua request API
+    params: {
+      api_key: API_KEY, // API key yang diperlukan untuk autentikasi TMDB API
+      language: "en-US", // Default bahasa untuk response
+      include_image_language: "en,null", // Menyertakan bahasa gambar dalam response
+    }
+  });
+} else {
+  throw new Error("Invalid NODE_ENV! Use 'development' or 'production'.");
+}
 
 // Interceptor untuk menangani request sebelum dikirim ke server
 apiClient?.interceptors.request.use(
@@ -50,3 +60,5 @@ apiClient?.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+export default apiClient;

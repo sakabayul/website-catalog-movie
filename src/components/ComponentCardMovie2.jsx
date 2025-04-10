@@ -13,17 +13,17 @@ import { useNavigate } from "react-router-dom";
  * @param {boolean} props.isError - Status apakah terjadi kesalahan saat mengambil data.
  * @param {string} props.query - Query pencarian film.
  */
-const CardMovie2 = ({ movies, isLoading, isError, query }) => {
+const CardMovie2 = ({ movies, isLoading, isError, query, type }) => {
   const navigate = useNavigate();
 
   /**
    * Fungsi untuk menangani klik pada kartu film.
    * Akan mengarahkan pengguna ke halaman detail film.
    * 
-   * @param {Object} movie - Objek film yang diklik.
+   * @param {Object} film - Objek film yang diklik.
    */
-  const handleCardClick = (movie) => {
-    navigate(`/about/${movie.id}`, { state: { movie } });
+  const handleCardClick = (film) => {
+      navigate(`/${type}/${film.id}`, { state: { film } });
   };
 
   // Jika data masih dimuat, tampilkan skeleton loading

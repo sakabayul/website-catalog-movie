@@ -10,12 +10,7 @@
  */
 import React from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import {
-  fetchFilteredMovies,
-  fetchFilteredTVSeries,
-} from "../api/movieApi";
-import useSearchQuery from "../services/useSearchQuery";
-import CardMovie2 from "./ComponentCardMovie2";
+import CardMovie2 from "../ComponentCardMovie2";
 import {
   Dialog,
   DialogBackdrop,
@@ -34,115 +29,102 @@ import {
   MinusIcon,
   PlusIcon,
 } from "@heroicons/react/20/solid";
+import componentFilterFilm from "./component-filter-film";
 
-export default function FilterMovie({ Type }) {
-  // State untuk mengontrol tampilan filter pada tampilan mobile
+export default function FilterMovie({ type }) {
   const [mobileFiltersOpen, setMobileFiltersOpen] = React.useState(false);
-
-  // State untuk menyimpan filter yang dipilih pengguna
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [isError, setIsError] = React.useState(false);
   const [selectedFilters, setSelectedFilters] = React.useState({
+    type,
     sortBy: "popularity.desc", // Default sorting berdasarkan popularitas
     genres: [],
     years: "",
     languages: "",
   });
-
-  // Opsi sorting yang tersedia
+  const [fetchDataFilms, setFetchDataFilms] = React.useState({
+    filterFilms: [],
+    genres: []
+  });
   const sortOptions = [
     { name: "Most Popular", value: "popularity.desc" },
     { name: "Best Rating", value: "vote_average.desc" },
     {
       name: "Newest",
-      value: Type === "Movies" ? "release_date.desc" : "first_air_date.desc",
+      value: type === "movie" ? "release_date.desc" : "first_air_date.desc",
     },
   ];
+  const fetchData = React.useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setIsError(false);
+      const rslt = await componentFilterFilm(
+        type,
+        selectedFilters.sortBy,
+        selectedFilters.genres,
+        selectedFilters.years,
+        selectedFilters.languages
+      );
+      if (rslt.ret === 0) {
+        setFetchDataFilms({
+          filterFilms: rslt.filterFilms,
+          genres: rslt.genres
+        });
+      } else {
+        console.warn("Message:", rslt.msg);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      setIsError(true);
+      console.error("Terjadi kesalahan:", error);
+    } finally {
+      setIsLoading(false);
+      setIsError(false);
+    }
+  }, [
+    type,
+    selectedFilters.sortBy,
+    selectedFilters.genres,
+    selectedFilters.years,
+    selectedFilters.languages
+  ]);
+  
+  React.useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
-  // Data genre berdasarkan tipe media (Movies atau TV Shows)
-  const movieGenres = [
-    { value: 28, label: "Action" },
-    { value: 12, label: "Adventure" },
-    { value: 16, label: "Animation" },
-    { value: 35, label: "Comedy" },
-    { value: 80, label: "Crime" },
-    { value: 99, label: "Documentary" },
-    { value: 18, label: "Drama" },
-    { value: 10751, label: "Family" },
-    { value: 14, label: "Fantasy" },
-    { value: 36, label: "History" },
-    { value: 27, label: "Horror" },
-    { value: 10402, label: "Music" },
-    { value: 9648, label: "Mystery" },
-    { value: 10749, label: "Romance" },
-    { value: 878, label: "Science Fiction" },
-    { value: 10770, label: "TV Movies" },
-    { value: 53, label: "Thriller" },
-    { value: 10752, label: "War" },
-    { value: 37, label: "Western" },
-  ];
-  // List genre untuk film
-  const tvGenres = [
-    { value: "10759", label: "Action & Adventure" },
-    { value: "35", label: "Comedy" },
-    { value: "18", label: "Drama" },
-    { value: "9648", label: "Mystery" },
-    { value: "10765", label: "Sci-Fi & Fantasy" },
-    { value: "16", label: "Animation" },
-    { value: "80", label: "Crime" },
-    { value: "99", label: "Documentary" },
-    { value: "10751", label: "Family" },
-    { value: "10762", label: "Kids" },
-    { value: "10763", label: "News" },
-    { value: "10764", label: "Reality" },
-    { value: "10766", label: "Soap" },
-    { value: "10767", label: "Talk" },
-    { value: "10768", label: "War & Politics" },
-  ];
   // Daftar filter yang digunakan dalam UI
   const filters = [
     {
       id: "genres",
       name: "Genre",
-      options: Type === "Movies" ? movieGenres : tvGenres,
+      options: fetchDataFilms.genres,
     },
     {
       id: "years",
       name: "Release Year",
       options: [
-        { value: "2025", label: "2025" },
-        { value: "2024", label: "2024" },
-        { value: "2023", label: "2023" },
-        { value: "2022", label: "2022" },
-        { value: "2021", label: "2021" },
-        { value: "2020", label: "2020" },
+        { id: "2025", name: "2025" },
+        { id: "2024", name: "2024" },
+        { id: "2023", name: "2023" },
+        { id: "2022", name: "2022" },
+        { id: "2021", name: "2021" },
+        { id: "2020", name: "2020" },
       ],
     },
     {
       id: "languages",
       name: "Language",
       options: [
-        { value: "en", label: "English" },
-        { value: "id", label: "Indonesian" },
-        { value: "fr", label: "French" },
-        { value: "es", label: "Spanish" },
-        { value: "ja", label: "Japanese" },
+        { id: "en", name: "English" },
+        { id: "id", name: "Indonesian" },
+        { id: "fr", name: "French" },
+        { id: "es", name: "Spanish" },
+        { id: "ja", name: "Japanese" },
       ],
     },
   ];
-
-  /**
-   * Mengambil data film atau TV Shows berdasarkan filter yang dipilih.
-   * Menggunakan custom hook `useSearchQuery` untuk fetch data dari API.
-   */
-  const {
-    data: filteredMovies,
-    isLoading: filteredLoading,
-    isError: filteredError,
-  } = useSearchQuery(
-    "filteredData",
-    selectedFilters,
-    Type === "Movies" ? fetchFilteredMovies : fetchFilteredTVSeries,
-    !!Type
-  );
+  const filteredMovies = fetchDataFilms.filterFilms;
 
   /**
    * Mengupdate filter berdasarkan kategori yang dipilih pengguna.
@@ -223,18 +205,18 @@ export default function FilterMovie({ Type }) {
                     <DisclosurePanel className="pt-6">
                       <div className="space-y-6">
                         {section.options.map((option, optionIdx) => (
-                          <div key={option.value} className="flex gap-3">
+                          <div key={option.id} className="flex gap-3">
                             <div className="flex h-5 shrink-0 items-center">
                               <div className="group grid size-4 grid-cols-1">
                                 <input
                                   type="checkbox"
                                   checked={selectedFilters[
                                     section.id
-                                  ]?.includes(option.value)}
+                                  ]?.includes(option.id)}
                                   onChange={() =>
-                                    handleFilterChange(section.id, option.value)
+                                    handleFilterChange(section.id, option.id)
                                   }
-                                  defaultValue={option.value}
+                                  defaultValue={option.id}
                                   id={`filter-mobile-${section.id}-${optionIdx}`}
                                   name={`${section.id}[]`}
                                   className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
@@ -265,7 +247,7 @@ export default function FilterMovie({ Type }) {
                               htmlFor={`filter-mobile-${section.id}-${optionIdx}`}
                               className="min-w-0 flex-1 text-gray-500"
                             >
-                              {option.label}
+                              {option.name}
                             </label>
                           </div>
                         ))}
@@ -280,7 +262,7 @@ export default function FilterMovie({ Type }) {
         <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-baseline justify-between border-b border-gray-200 pt-24 pb-6">
             <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-              {Type}
+              {type === "movie"? "Movies" : "TV Series"}
             </h1>
             <div className="flex items-center">
               {/* Sort Menu */}
@@ -349,18 +331,18 @@ export default function FilterMovie({ Type }) {
                     <DisclosurePanel className="pt-6">
                       <div className="space-y-4">
                         {section.options.map((option, optionIdx) => (
-                          <div key={option.value} className="flex gap-3">
+                          <div key={option.id} className="flex gap-3">
                             <div className="flex h-5 shrink-0 items-center">
                               <div className="group grid size-4 grid-cols-1">
                                 <input
                                   type="checkbox"
                                   checked={selectedFilters[
                                     section.id
-                                  ]?.includes(option.value)}
+                                  ]?.includes(option.id)}
                                   onChange={() =>
-                                    handleFilterChange(section.id, option.value)
+                                    handleFilterChange(section.id, option.id)
                                   }
-                                  defaultValue={option.value}
+                                  defaultValue={option.id}
                                   defaultChecked={option.checked}
                                   id={`filter-${section.id}-${optionIdx}`}
                                   name={`${section.id}[]`}
@@ -392,7 +374,7 @@ export default function FilterMovie({ Type }) {
                               htmlFor={`filter-${section.id}-${optionIdx}`}
                               className="text-sm text-gray-600 cursor-pointer"
                             >
-                              {option.label}
+                              {option.name}
                             </label>
                           </div>
                         ))}
@@ -407,8 +389,9 @@ export default function FilterMovie({ Type }) {
               <div>
                 <CardMovie2
                   movies={filteredMovies}
-                  isLoading={filteredLoading}
-                  isError={filteredError}
+                  isLoading={isLoading}
+                  isError={isError}
+                  type={type}
                 />
               </div>
             </div>
